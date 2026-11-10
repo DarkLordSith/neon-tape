@@ -1,0 +1,447 @@
+/* Критический CSS: безопасные отступы и запрет миганий до применения основных стилей. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+:root {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+body {
+  margin: 0;
+  font-size: 14px;
+}
+[hidden] {
+  display: none !important;
+}
+
+/* Layout: one hardware deck — cassette window, LCD, transport keys, shift log. Single committed dark neon look. */
+:root {
+  color-scheme: dark;
+
+  --bg: #0a0811;
+  --shell: #17131f;
+  --shell-2: #211b2b;
+  --edge: #3a3148;
+
+  --ink: #ece6f5;
+  --dim: #8f86a3;
+  --pink: #ff4f9a;
+  --cyan: #3fe6ff;
+  --amber: #ffb84d;
+
+  --lcd: #061719;
+  --lcd-ink: #7ff3ff;
+  --lcd-dim: #2f7c86;
+  --tape: #3b261c;
+  --hub: #d9d3e3;
+
+  --f-display: "Chakra Petch", "Arial Narrow", system-ui, sans-serif;
+  --f-mono: "Share Tech Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+html,
+body {
+  height: 100%;
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
+body {
+  background:
+    radial-gradient(120% 60% at 50% -10%, color-mix(in srgb, var(--pink) 18%, transparent), transparent 60%),
+    radial-gradient(90% 50% at 100% 110%, color-mix(in srgb, var(--cyan) 12%, transparent), transparent 60%),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--f-display);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  /* Вертикальные отступы ужимаются на невысоких экранах, чтобы всё помещалось без скролла. */
+  padding-block: clamp(10px, 3dvh, 20px) clamp(10px, 3dvh, 32px);
+  display: flex;
+  justify-content: center;
+}
+
+.deck {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.6dvh, 14px);
+}
+
+.brand {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.brand h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.brand h1 span {
+  color: var(--pink);
+}
+.brand small {
+  font-family: var(--f-mono);
+  color: var(--dim);
+  font-size: .72rem;
+  letter-spacing: .08em;
+}
+
+.body {
+  background: linear-gradient(180deg, var(--shell-2), var(--shell));
+  border: 1px solid var(--edge);
+  border-radius: 18px;
+  padding: clamp(10px, 1.8dvh, 14px);
+  box-shadow:
+    0 0 0 1px #000 inset,
+    0 24px 60px -20px color-mix(in srgb, var(--pink) 35%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.6dvh, 14px);
+  /*
+   * .body сама — flex-контейнер, и по умолчанию её «сжимаемый минимум» как элемента
+   * внешней колонки (.deck) равен размеру её содержимого, а не 0. Это мешает внешнему
+   * flexbox честно ужать карточку на низких экранах. Снимаем этот неявный пол.
+   */
+  min-height: 0;
+}
+
+/* Кассета держит свои пропорции, но её высота ужимается на невысоких экранах. */
+.cassette {
+  width: 100%;
+  max-width: 320px;
+  max-height: clamp(84px, 22dvh, 190px);
+  aspect-ratio: 340 / 214;
+  margin-inline: auto;
+  /* Та же причина: aspect-ratio сам по себе навязывает больший неявный минимум — обнуляем его. */
+  min-height: 0;
+}
+.cassette svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.lcd {
+  background: var(--lcd);
+  border-radius: 10px;
+  padding: clamp(8px, 1.6dvh, 12px) 14px;
+  border: 1px solid color-mix(in srgb, var(--cyan) 25%, var(--edge));
+  font-family: var(--f-mono);
+  color: var(--lcd-ink);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--cyan) 55%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(5px, 1dvh, 8px);
+  font-variant-numeric: tabular-nums;
+}
+.lcd-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.big {
+  font-size: 2.1rem;
+  letter-spacing: .04em;
+  line-height: 1;
+}
+.big .of {
+  font-size: .9rem;
+  color: var(--lcd-dim);
+}
+.state {
+  font-size: .78rem;
+  letter-spacing: .12em;
+  color: var(--pink);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--pink) 60%, transparent);
+}
+.shift {
+  position: relative;
+  height: 10px;
+  border: 1px solid var(--lcd-dim);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.shift i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: var(--lcd-ink);
+  box-shadow: 0 0 8px var(--cyan);
+}
+.shift .ticks {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(100% / 16 - 1px), var(--lcd) calc(100% / 16 - 1px) calc(100% / 16));
+}
+.scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: .62rem;
+  color: var(--lcd-dim);
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.stats b {
+  font-weight: 400;
+  font-size: 1.05rem;
+}
+.stats span {
+  font-size: .62rem;
+  letter-spacing: .14em;
+  color: var(--lcd-dim);
+}
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: .72rem;
+  color: var(--lcd-dim);
+}
+.vu {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.vu div {
+  height: 4px;
+  width: 0;
+  background: linear-gradient(90deg, var(--cyan), var(--cyan) 70%, var(--amber) 85%, var(--pink));
+  transition: width .08s linear;
+}
+
+.alert {
+  border: 1px solid var(--pink);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: color-mix(in srgb, var(--pink) 10%, var(--shell));
+  animation: pulse 2.4s ease-in-out infinite;
+}
+.alert p {
+  margin: 0;
+  line-height: 1.4;
+  font-size: .92rem;
+}
+.alert .row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+@keyframes pulse {
+  50% {
+    box-shadow: 0 0 22px -4px var(--pink);
+  }
+}
+
+.keys {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr 1.3fr;
+  gap: 8px;
+}
+
+button {
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+  background: linear-gradient(180deg, #2c2538, #1b1623);
+  border: 1px solid var(--edge);
+  border-bottom-width: 4px;
+  border-radius: 8px;
+  padding: clamp(8px, 1.6dvh, 12px) 8px;
+  min-height: clamp(42px, 7dvh, 52px);
+  font-weight: 600;
+  letter-spacing: .06em;
+  font-size: .86rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: transform .05s, border-bottom-width .05s;
+}
+button:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+button:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+button.main {
+  color: var(--bg);
+  background: linear-gradient(180deg, var(--cyan), color-mix(in srgb, var(--cyan) 70%, #000));
+  border-color: color-mix(in srgb, var(--cyan) 60%, #000);
+}
+button.main.on {
+  background: linear-gradient(180deg, var(--pink), color-mix(in srgb, var(--pink) 65%, #000));
+  border-color: color-mix(in srgb, var(--pink) 55%, #000);
+}
+button.ghost {
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: .8rem;
+}
+button.hot {
+  background: var(--pink);
+  color: var(--bg);
+  border-color: color-mix(in srgb, var(--pink) 55%, #000);
+}
+
+.vol {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  color: var(--dim);
+  letter-spacing: .1em;
+}
+.vol input {
+  flex: 1;
+  accent-color: var(--pink);
+  min-width: 0;
+}
+
+.hint {
+  font-size: clamp(.78rem, 1.6dvh, .88rem);
+  line-height: 1.45;
+  color: var(--dim);
+  margin: 0;
+  min-height: clamp(2em, 4dvh, 2.6em);
+}
+.hint b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  color: var(--dim);
+}
+
+.playlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--f-mono);
+  font-size: .8rem;
+  /* Подстраховка: если на очень низком экране список всё же не влезает, скроллится он сам, а не вся страница. */
+  max-height: clamp(110px, 22dvh, 220px);
+  overflow-y: auto;
+  /*
+   * У элемента с overflow:auto браузер считает его «сжимаемый минимум» равным 0 —
+   * без этого правила flexbox в первую очередь выжимает именно список почти в ноль,
+   * а декоративная кассета остаётся нетронутой. flex-shrink:0 переворачивает приоритет:
+   * список держит свой размер, а кассета/LCD сжимаются первыми.
+   */
+  flex-shrink: 0;
+}
+.playlist li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: var(--dim);
+  cursor: pointer;
+}
+.playlist li.cur {
+  color: var(--amber);
+  background: color-mix(in srgb, var(--amber) 8%, transparent);
+}
+.playlist li span:last-child {
+  white-space: nowrap;
+}
+
+/*
+ * Широкий экран: плеер слева, плейлист справа — вместо одной длинной колонки.
+ * Второе условие (landscape-телефон низкой высоты) переключает ту же сетку и на
+ * альбомную ориентацию мобильника, где одноколоночная вёрстка не влезает по высоте.
+ */
+@media (min-width: 760px), (orientation: landscape) and (max-width: 759.98px) and (max-height: 520px) {
+  body {
+    /* На высоких экранах не прижимаем колоду к верху — центрируем по вертикали. */
+    align-items: center;
+  }
+  .deck {
+    max-width: 920px;
+    display: grid;
+    grid-template-columns: minmax(280px, 420px) minmax(200px, 1fr);
+    column-gap: 22px;
+    grid-template-areas:
+      "brand brand"
+      "body  list"
+      "hint  list"
+      "foot  list";
+  }
+  .brand {
+    grid-area: brand;
+  }
+  .body {
+    grid-area: body;
+  }
+  .hint {
+    grid-area: hint;
+  }
+  .playlist {
+    grid-area: list;
+    /* В сетке список растягивается на высоту левой колонки и скроллится сам при переполнении. */
+    max-height: none;
+    height: 100%;
+  }
+  .foot {
+    grid-area: foot;
+  }
+}
+
+/*
+ * Телефон плашмя (альбомная ориентация): высоты мало даже в две колонки.
+ * Прячем чисто декоративные блоки, оставляя только то, что нужно для работы:
+ * время смены, статус, шкалу фокуса и сами кнопки.
+ */
+@media (max-height: 430px) {
+  .cassette,
+  .scale,
+  .meta,
+  .vu,
+  .hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alert {
+    animation: none;
+  }
+  .vu div {
+    transition: none;
+  }
+}
