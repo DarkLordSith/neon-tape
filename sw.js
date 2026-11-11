@@ -1,7 +1,7 @@
 // Service worker: кэширует оболочку приложения, чтобы плеер работал офлайн.
 // Меняй VERSION при каждом деплое — так старый кэш удалится.
-const VERSION = 'neon-tape-v1';
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
+const VERSION = 'neon-tape-v2';
+const SHELL = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
